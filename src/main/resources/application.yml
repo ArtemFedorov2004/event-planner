@@ -1,2 +1,12 @@
 api:
   path: api/v1
+spring:
+  config:
+    import: env.yml
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${USER_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
