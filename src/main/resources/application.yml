@@ -1,5 +1,5 @@
 api:
-  path: api/v1
+  path: /api/v1
 spring:
   config:
     import: env.yml
