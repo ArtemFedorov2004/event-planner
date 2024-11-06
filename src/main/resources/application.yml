@@ -1,5 +1,3 @@
-api:
-  path: /api/v1
 spring:
   config:
     import: env.yml
@@ -9,4 +7,7 @@ spring:
     password: ${USER_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
+  flyway:
+    baseline-on-migrate: true
+    enabled: true

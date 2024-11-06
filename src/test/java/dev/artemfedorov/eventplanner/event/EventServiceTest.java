@@ -16,10 +16,10 @@ import static org.mockito.Mockito.when;
 class EventServiceTest {
 
     @Mock
-    private EventRepository employeeRepository;
+    EventRepository employeeRepository;
 
     @InjectMocks
-    private EventService employeeService;
+    EventService employeeService;
 
     @Test
     void shouldReturnCreatedEvent() {

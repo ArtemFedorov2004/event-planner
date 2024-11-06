@@ -1,5 +1,6 @@
 package dev.artemfedorov.eventplanner.event;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,7 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("${api.path}/events")
+@RequestMapping("/api/events")
 public class EventController {
 
     private final EventService eventService;
@@ -20,7 +21,7 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody Event event) {
+    public ResponseEntity<?> handleCreateEvent(@Valid @RequestBody Event event) {
         Event createdEvent = eventService.create(event);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -30,6 +31,4 @@ public class EventController {
 
         return ResponseEntity.created(location).build();
     }
-
-
 }
