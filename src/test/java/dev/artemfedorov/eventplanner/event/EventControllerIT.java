@@ -42,4 +42,19 @@ class EventControllerIT {
                         jsonPath("$").doesNotExist()
                 );
     }
+
+    @Test
+    void handleCreateEvent_EventIsInvalid_ReturnsValidResponseEntity() throws Exception {
+        var requestBuilder = post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "date": "2023-11-07 13:55:00",
+                            "budget": -5
+                        }
+                        """);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
+    }
 }
