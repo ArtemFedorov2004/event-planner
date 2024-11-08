@@ -37,4 +37,10 @@ public class Event {
     @DecimalMin(value = "0.0", message = "Budget must not be negative")
     @NotNull
     private BigDecimal budget;
+
+    public Event(String name, LocalDateTime date, BigDecimal budget) {
+        this.name = name;
+        this.date = date;
+        this.budget = budget;
+    }
 }
