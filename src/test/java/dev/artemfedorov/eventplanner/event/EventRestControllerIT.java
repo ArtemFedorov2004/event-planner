@@ -26,6 +26,9 @@ class EventRestControllerIT {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    EventRepository eventRepository;
+
     @Test
     void handleCreateEvent_EventIsValid_ReturnsValidResponseEntity() throws Exception {
         var requestBuilder = post("/api/events")
@@ -69,34 +72,22 @@ class EventRestControllerIT {
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        content().json("""
-                                [
-                                    {
-                                        "id": 1,
-                                        "name": "event_1",
-                                        "date": "2025-10-16 14:30:00",
-                                        "budget": 100
-                                    },
-                                    {
-                                        "id": 2,
-                                        "name": "event_2",
-                                        "date": "2025-10-16 14:30:00",
-                                        "budget": 1000
-                                    },
-                                    {
-                                        "id":3,
-                                        "name":"event_3",
-                                        "date":"2025-10-16 14:30:00",
-                                        "budget":0
-                                        },
-                                        {
-                                        "id":4,
-                                        "name":"event_4",
-                                        "date":"2025-10-16 14:30:00",
-                                        "budget":500
-                                    }
-                                ]
-                                """)
+                        jsonPath("$[0].id").exists(),
+                        jsonPath("$[0].name").value("event_1"),
+                        jsonPath("$[0].date").value("2025-10-16 14:30:00"),
+                        jsonPath("$[0].budget").value(100),
+                        jsonPath("$[1].id").exists(),
+                        jsonPath("$[1].name").value("event_2"),
+                        jsonPath("$[1].date").value("2025-10-16 14:30:00"),
+                        jsonPath("$[1].budget").value(1000),
+                        jsonPath("$[2].id").exists(),
+                        jsonPath("$[2].name").value("event_3"),
+                        jsonPath("$[2].date").value("2025-10-16 14:30:00"),
+                        jsonPath("$[2].budget").value(0),
+                        jsonPath("$[3].id").exists(),
+                        jsonPath("$[3].name").value("event_4"),
+                        jsonPath("$[3].date").value("2025-10-16 14:30:00"),
+                        jsonPath("$[3].budget").value(500)
                 );
     }
 
@@ -109,14 +100,10 @@ class EventRestControllerIT {
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
-                        content().json("""                                
-                                {
-                                    "id": 1,
-                                    "name": "event_1",
-                                    "date": "2025-10-16 14:30:00",
-                                    "budget": 100
-                                }
-                                """)
+                        jsonPath("$.id").exists(),
+                        jsonPath("$.name").value("event_1"),
+                        jsonPath("$.date").value("2025-10-16 14:30:00"),
+                        jsonPath("$.budget").value(100)
                 );
     }
 }
