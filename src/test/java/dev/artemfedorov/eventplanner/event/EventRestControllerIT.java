@@ -12,6 +12,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -93,7 +96,14 @@ class EventRestControllerIT {
 
     @Test
     void handleGetEventById_EventWithThisIdExists_ReturnsValidResponseEntity() throws Exception {
-        Integer id = 1;
+        Integer id = eventRepository.save(Event.builder()
+                        .name("event_name")
+                        .date(LocalDateTime.parse("2025-11-17T15:30:00"))
+                        .budget(new BigDecimal(250))
+                        .build()
+                )
+                .getId();
+
         var requestBuilder = get("/api/events/{id}", id);
 
         mockMvc.perform(requestBuilder)
@@ -101,9 +111,9 @@ class EventRestControllerIT {
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("$.id").exists(),
-                        jsonPath("$.name").value("event_1"),
-                        jsonPath("$.date").value("2025-10-16 14:30:00"),
-                        jsonPath("$.budget").value(100)
+                        jsonPath("$.name").value("event_name"),
+                        jsonPath("$.date").value("2025-11-17 15:30:00"),
+                        jsonPath("$.budget").value(250)
                 );
     }
 }
