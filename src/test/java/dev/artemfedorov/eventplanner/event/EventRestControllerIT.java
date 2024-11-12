@@ -13,8 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -64,7 +66,13 @@ class EventRestControllerIT {
                         """);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isBadRequest());
+                .andExpectAll(
+                        status().isBadRequest(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$.name").value(containsString("Name cannot be blank")),
+                        jsonPath("$.date").value("Date must be in the future"),
+                        jsonPath("$.budget").value("Budget must not be negative")
+                );
     }
 
     @Test
@@ -95,7 +103,7 @@ class EventRestControllerIT {
     }
 
     @Test
-    void handleGetEventById_EventWithThisIdExists_ReturnsValidResponseEntity() throws Exception {
+    void handleGetEventById_EventWithGivenIdExists_ReturnsValidResponseEntity() throws Exception {
         Integer id = eventRepository.save(Event.builder()
                         .name("event_name")
                         .date(LocalDateTime.parse("2025-11-17T15:30:00"))
@@ -114,6 +122,20 @@ class EventRestControllerIT {
                         jsonPath("$.name").value("event_name"),
                         jsonPath("$.date").value("2025-11-17 15:30:00"),
                         jsonPath("$.budget").value(250)
+                );
+    }
+
+    @Test
+    void handleGetEventById_EventWithGivenIdDoesNotExist_ReturnsValidResponseEntity() throws Exception {
+        Integer id = 10000;
+
+        var requestBuilder = get("/api/events/{id}", id);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isBadRequest(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Could not find event with id: " + id)
                 );
     }
 }
