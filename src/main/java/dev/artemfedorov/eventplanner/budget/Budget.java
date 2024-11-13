@@ -1,6 +1,6 @@
 package dev.artemfedorov.eventplanner.budget;
 
-import dev.artemfedorov.eventplanner.category.Category;
+import dev.artemfedorov.eventplanner.event.category.Category;
 
 import java.math.BigDecimal;
 
