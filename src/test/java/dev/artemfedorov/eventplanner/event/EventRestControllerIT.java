@@ -132,7 +132,7 @@ class EventRestControllerIT {
 
         mockMvc.perform(requestBuilder)
                 .andExpectAll(
-                        status().isBadRequest(),
+                        status().isNotFound(),
                         content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
                         content().string("Could not find event with id: " + id)
                 );

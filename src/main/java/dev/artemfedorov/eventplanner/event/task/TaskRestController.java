@@ -48,4 +48,15 @@ public class TaskRestController {
     ) {
         return ResponseEntity.ok(taskService.findTaskByEventIdAndTaskId(eventId, taskId));
     }
+
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<?> handleDeleteEventTaskById(
+            @PathVariable Integer eventId,
+            @PathVariable Integer taskId
+    ) {
+        taskService.deleteTaskByEventIdAndTaskId(eventId, taskId);
+
+        return ResponseEntity.noContent()
+                .build();
+    }
 }

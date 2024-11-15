@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Sql("/sql/event/task/task_rest_controller/test_data.sql")
@@ -32,6 +32,9 @@ class TaskRestControllerIT {
 
     @Autowired
     EventRepository eventRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Test
     void handleAddTaskToEventById_EventWithGivenIdExists_ReturnsValidResponseEntity() throws Exception {
@@ -95,7 +98,7 @@ class TaskRestControllerIT {
 
         mockMvc.perform(requestBuilder)
                 .andExpectAll(
-                        status().isBadRequest(),
+                        status().isNotFound(),
                         content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
                         content().string("Could not find event with id: " + eventId)
                 );
@@ -140,7 +143,7 @@ class TaskRestControllerIT {
 
         mockMvc.perform(requestBuilder)
                 .andExpectAll(
-                        status().isBadRequest(),
+                        status().isNotFound(),
                         content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
                         content().string("Could not find event with id: " + eventId)
                 );
@@ -170,7 +173,7 @@ class TaskRestControllerIT {
 
         mockMvc.perform(requestBuilder)
                 .andExpectAll(
-                        status().isBadRequest(),
+                        status().isNotFound(),
                         content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
                         content().string("Task with id " + taskId + " for event " + eventId + " not found")
                 );
@@ -185,7 +188,53 @@ class TaskRestControllerIT {
 
         mockMvc.perform(requestBuilder)
                 .andExpectAll(
-                        status().isBadRequest(),
+                        status().isNotFound(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Could not find event with id: " + eventId)
+                );
+    }
+
+    @Test
+    void handleDeleteEventTaskById_EventWithGivenIdHasTaskWithGivenId_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 1;
+        Integer taskId = 1;
+
+        var requestBuilder = delete("/api/events/{eventId}/tasks/{taskId}", eventId, taskId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isNoContent(),
+                        jsonPath("$").doesNotExist()
+                );
+
+        assertTrue(taskRepository.findById(taskId).isEmpty());
+    }
+
+    @Test
+    void handleDeleteEventTaskById_EventWithGivenIdDoesNotHaveTaskWithGivenId_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 1;
+        Integer taskId = 10;
+
+        var requestBuilder = delete("/api/events/{eventId}/tasks/{taskId}", eventId, taskId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isNotFound(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Task with id " + taskId + " for event " + eventId + " not found")
+                );
+    }
+
+    @Test
+    void handleDeleteEventTaskById_EventWithGivenIdDoesNotExist_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 100;
+        Integer taskId = 1;
+
+        var requestBuilder = delete("/api/events/{eventId}/tasks/{taskId}", eventId, taskId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isNotFound(),
                         content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
                         content().string("Could not find event with id: " + eventId)
                 );
