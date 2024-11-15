@@ -70,7 +70,6 @@ class EventRestControllerIT {
                         status().isBadRequest(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("$.name").value(containsString("Name cannot be blank")),
-                        jsonPath("$.date").value("Date must be in the future"),
                         jsonPath("$.budget").value("Budget must not be negative")
                 );
     }

@@ -1,4 +1,4 @@
-package dev.artemfedorov.eventplanner.category;
+package dev.artemfedorov.eventplanner.event.category;
 
 public enum Category {
     NOT_SPECIFIED,

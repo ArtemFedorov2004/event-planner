@@ -1,4 +1,4 @@
-package dev.artemfedorov.eventplanner.task;
+package dev.artemfedorov.eventplanner.event.task;
 
 import lombok.Getter;
 import lombok.Setter;
