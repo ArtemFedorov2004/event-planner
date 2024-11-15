@@ -15,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Sql("/sql/task_rest_controller/test_data.sql")
+@Sql("/sql/event/task/task_rest_controller/test_data.sql")
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -90,6 +92,96 @@ class TaskRestControllerIT {
                             "status": "IN_PROGRESS"
                         }
                         """);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isBadRequest(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Could not find event with id: " + eventId)
+                );
+    }
+
+    @Test
+    void handleGetAllEventTasks_EventWithGivenIdHasTasks_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 1;
+
+        var requestBuilder = get("/api/events/{id}/tasks", eventId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$", hasSize(3)),
+                        jsonPath("$[0].name").value("task_1"),
+                        jsonPath("$[1].name").value("task_2"),
+                        jsonPath("$[2].name").value("task_3")
+                );
+    }
+
+    @Test
+    void handleGetAllEventTasks_EventWithGivenIdHasNoTasks_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 2;
+
+        var requestBuilder = get("/api/events/{id}/tasks", eventId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$", hasSize(0))
+                );
+    }
+
+    @Test
+    void handleGetAllEventTasks_EventWithGivenIdDoesNotExist_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 3;
+
+        var requestBuilder = get("/api/events/{id}/tasks", eventId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isBadRequest(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Could not find event with id: " + eventId)
+                );
+    }
+
+    @Test
+    void handleGetEventTaskById_EventWithGivenIdHasTaskWithGivenId_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 1;
+        Integer taskId = 1;
+
+        var requestBuilder = get("/api/events/{eventId}/tasks/{taskId}", eventId, taskId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        jsonPath("$.name").value("task_1")
+                );
+    }
+
+    @Test
+    void handleGetEventTaskById_EventWithGivenIdDoesNotHaveTaskWithGivenId_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 1;
+        Integer taskId = 10;
+
+        var requestBuilder = get("/api/events/{eventId}/tasks/{taskId}", eventId, taskId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isBadRequest(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Task with id " + taskId + " for event " + eventId + " not found")
+                );
+    }
+
+    @Test
+    void handleGetEventTaskById_EventWithGivenIdDoesNotExist_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 10;
+        Integer taskId = 10;
+
+        var requestBuilder = get("/api/events/{eventId}/tasks/{taskId}", eventId, taskId);
 
         mockMvc.perform(requestBuilder)
                 .andExpectAll(

@@ -1,5 +1,6 @@
 package dev.artemfedorov.eventplanner.event;
 
+import dev.artemfedorov.eventplanner.event.task.Task;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,5 +25,12 @@ public class EventService {
     public Event getEventById(Integer id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotFoundException(id));
+    }
+
+    public List<Task> getAllEventTasks(Integer eventId) {
+        eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(eventId));
+
+        return eventRepository.findAllTasksByEventId(eventId);
     }
 }

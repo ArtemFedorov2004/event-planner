@@ -1,6 +1,7 @@
 package dev.artemfedorov.eventplanner.exceptionhandler;
 
 import dev.artemfedorov.eventplanner.event.EventNotFoundException;
+import dev.artemfedorov.eventplanner.event.task.TaskNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,11 @@ public class RestControllerExceptionHandler {
 
     @ExceptionHandler(EventNotFoundException.class)
     public ResponseEntity<String> handleEventNotFoundException(EventNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<String> handleTaskNotFoundException(TaskNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 

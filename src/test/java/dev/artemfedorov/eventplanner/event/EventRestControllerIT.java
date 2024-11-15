@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Sql("/sql/event_rest_controller/test_data.sql")
+@Sql("/sql/event/event_rest_controller/test_data.sql")
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
