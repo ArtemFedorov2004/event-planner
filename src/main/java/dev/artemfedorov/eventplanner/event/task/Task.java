@@ -1,6 +1,7 @@
 package dev.artemfedorov.eventplanner.event.task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.artemfedorov.eventplanner.event.Event;
 import dev.artemfedorov.eventplanner.event.category.Category;
 import jakarta.persistence.*;
@@ -51,5 +52,6 @@ public class Task {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_event")
+    @JsonIgnore
     private Event event;
 }

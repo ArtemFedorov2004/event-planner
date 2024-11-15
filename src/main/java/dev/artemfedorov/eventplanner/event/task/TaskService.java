@@ -24,4 +24,12 @@ public class TaskService {
         task.setEvent(event);
         return taskRepository.save(task);
     }
+
+    public Task findTaskByEventIdAndTaskId(Integer eventId, Integer taskId) {
+        eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(eventId));
+
+        return taskRepository.findByEventIdAndId(eventId, taskId)
+                .orElseThrow(() -> new TaskNotFoundException(eventId, taskId));
+    }
 }
