@@ -32,4 +32,13 @@ public class TaskService {
         return taskRepository.findByEventIdAndId(eventId, taskId)
                 .orElseThrow(() -> new TaskNotFoundException(eventId, taskId));
     }
+
+    public void deleteTaskByEventIdAndTaskId(Integer eventId, Integer taskId) {
+        eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(eventId));
+        taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException(eventId, taskId));
+
+        taskRepository.deleteById(taskId);
+    }
 }
