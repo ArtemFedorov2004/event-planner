@@ -41,6 +41,7 @@ public class Task {
     private String note;
 
     @Column(name = "c_category")
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @Column(name = "c_date")
@@ -48,10 +49,22 @@ public class Task {
     private LocalDateTime date;
 
     @Column(name = "c_status")
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_event")
     @JsonIgnore
     private Event event;
+
+    @PreUpdate
+    @PrePersist
+    public void prePersist() {
+        if (category == null) {
+            category = Category.NOT_SPECIFIED;
+        }
+        if (status == null) {
+            status = TaskStatus.TO_DO;
+        }
+    }
 }
