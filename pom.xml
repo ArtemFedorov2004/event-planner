@@ -28,6 +28,7 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
     </properties>
     <dependencies>
         <dependency>
@@ -69,6 +70,12 @@
             <artifactId>flyway-database-postgresql</artifactId>
             <version>10.20.1</version>
         </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${commons-beanutils.version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

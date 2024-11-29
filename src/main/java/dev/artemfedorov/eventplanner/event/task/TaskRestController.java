@@ -1,13 +1,16 @@
 package dev.artemfedorov.eventplanner.event.task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.artemfedorov.eventplanner.event.EventService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/events/{eventId}/tasks")
@@ -17,9 +20,12 @@ public class TaskRestController {
 
     private final EventService eventService;
 
-    public TaskRestController(TaskService taskService, EventService eventService) {
+    private final ObjectMapper objectMapper;
+
+    public TaskRestController(TaskService taskService, EventService eventService, ObjectMapper objectMapper) {
         this.taskService = taskService;
         this.eventService = eventService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping
@@ -55,6 +61,19 @@ public class TaskRestController {
             @PathVariable Integer taskId
     ) {
         taskService.deleteTaskByEventIdAndTaskId(eventId, taskId);
+
+        return ResponseEntity.noContent()
+                .build();
+    }
+
+    @PatchMapping(path = "/{taskId}")
+    public ResponseEntity<?> handleEditTask(
+            @PathVariable Integer eventId,
+            @PathVariable Integer taskId,
+            @RequestBody Map<String, Object> patch
+    ) throws InvocationTargetException, IllegalAccessException {
+        Task patchTask = objectMapper.convertValue(patch, Task.class);
+        taskService.editTaskByEventIdAndTaskId(patchTask, eventId, taskId);
 
         return ResponseEntity.noContent()
                 .build();
