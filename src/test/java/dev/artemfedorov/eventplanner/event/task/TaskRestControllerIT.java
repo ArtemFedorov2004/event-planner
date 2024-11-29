@@ -2,6 +2,7 @@ package dev.artemfedorov.eventplanner.event.task;
 
 import dev.artemfedorov.eventplanner.TestcontainersConfig;
 import dev.artemfedorov.eventplanner.event.EventRepository;
+import dev.artemfedorov.eventplanner.event.category.Category;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -231,6 +233,85 @@ class TaskRestControllerIT {
         Integer taskId = 1;
 
         var requestBuilder = delete("/api/events/{eventId}/tasks/{taskId}", eventId, taskId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isNotFound(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Could not find event with id: " + eventId)
+                );
+    }
+
+    @Test
+    void handleEditTask_EventWithGivenIdHasTaskWithGivenIdAndPatchIsValid_ReturnsValidResponseEntity() throws Exception {
+        Task task = taskRepository.findAll()
+                .getFirst();
+        Integer taskId = task.getId();
+        Integer eventId = task.getEvent()
+                .getId();
+
+        var requestBuilder = patch("/api/events/{eventId}/tasks/{taskId}", eventId, taskId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "status": "DONE",
+                            "note": "Edited note",
+                            "category": "PHOTOS_AND_VIDEOS"
+                        }
+                        """);
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isNoContent(),
+                        jsonPath("$").doesNotExist()
+                );
+        Task editedTask = taskRepository.findByEventIdAndId(eventId, taskId)
+                .orElseThrow();
+        assertEquals(task.getId(), editedTask.getId());
+        assertEquals(task.getName(), editedTask.getName());
+        assertEquals("Edited note", editedTask.getNote());
+        assertEquals(Category.PHOTOS_AND_VIDEOS, editedTask.getCategory());
+        assertEquals(task.getDate(), editedTask.getDate());
+        assertEquals(task.getEvent(), editedTask.getEvent());
+        assertEquals(TaskStatus.DONE, editedTask.getStatus());
+    }
+
+    @Test
+    void handleEditTask_EventWithGivenIdDoesNotHaveTaskWithGivenId_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 1;
+        Integer taskId = 10;
+
+        var requestBuilder = patch("/api/events/{eventId}/tasks/{taskId}", eventId, taskId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "status": "DONE",
+                            "note": "Edited note",
+                            "category": "PHOTOS_AND_VIDEOS"
+                        }
+                        """);
+
+        mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isNotFound(),
+                        content().contentType(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8)),
+                        content().string("Task with id " + taskId + " for event " + eventId + " not found")
+                );
+    }
+
+    @Test
+    void handleEditTask_EventWithGivenIdDoesNotExist_ReturnsValidResponseEntity() throws Exception {
+        Integer eventId = 100;
+        Integer taskId = 1;
+
+        var requestBuilder = patch("/api/events/{eventId}/tasks/{taskId}", eventId, taskId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "status": "DONE",
+                            "note": "Edited note",
+                            "category": "PHOTOS_AND_VIDEOS"
+                        }
+                        """);
 
         mockMvc.perform(requestBuilder)
                 .andExpectAll(
